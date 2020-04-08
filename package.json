@@ -1,0 +1,22 @@
+{
+    "name": "stopngo",
+    "version": "0.0.1",
+    "scripts": {
+        "start": "node app.js"
+    },
+    "dependencies": {
+        "@cloudant/cloudant": "^3.0.2",
+        "body-parser": "1.17.x",
+        "ejs": "^3.0.1",
+        "express": "4.17.x",
+        "express-session": "^1.16.2",
+        "jsonwebtoken": "^8.5.1",
+        "oauth": "^0.9.15",
+        "request": "^2.88.0",
+        "twitter": "1.7.1"
+    },
+    "repository": {},
+    "engines": {
+        "node": "8.x"
+    }
+}

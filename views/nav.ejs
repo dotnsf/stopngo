@@ -1,0 +1,65 @@
+
+<script>
+$(function(){
+});
+
+function login(){
+  //window.location.href = '/login';
+  window.location.href = '/twitter';
+}
+
+function logout(){
+  if( window.confirm( 'ログアウトしますか？' ) ){
+    $.ajax({
+      url: '/logout',
+      type: 'POST',
+      success: function( result ){
+        window.location.href = '/';
+      },
+      error: function( e0, e1, e2 ){
+        console.log( e1 + ' : ' + e2 );
+      }
+    });
+  }
+}
+
+function timestamp2datetime( ts ){
+  var dt = new Date( ts );
+  var yyyy = dt.getFullYear();
+  var mm = dt.getMonth() + 1;
+  var dd = dt.getDate();
+  var hh = dt.getHours();
+  var nn = dt.getMinutes();
+  var ss = dt.getSeconds();
+  var datetime = yyyy + '-' + ( mm < 10 ? '0' : '' ) + mm + '-' + ( dd < 10 ? '0' : '' ) + dd
+    + ' ' + ( hh < 10 ? '0' : '' ) + hh + ':' + ( nn < 10 ? '0' : '' ) + nn + ':' + ( ss < 10 ? '0' : '' ) + ss;
+  return datetime;
+}
+</script>
+<style>
+</style>
+
+<nav class="navbar navbar-light bg-light">
+  <a class="navbar-brand" href="#">Stop n Go</a>
+  <ul class="navbar-nav mr-auto">
+  </ul>
+  <ul class="navbar-nav float-right" style="float:right!important;" id="navbar">
+    <li class="nav-item">
+<% if( user ){ %>
+      <div class="dropdown">
+        <button type="button" id="dropdown1" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <img width="30" height="30" src="/profileimage?screen_name=<%= user.screen_name %>"/>
+          <%= user.screen_name %>
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdown1">
+          <a class="dropdown-item" href="#" onClick="logout()">
+            <i class="fas fa-sign-in-alt"></i>Logout
+          </a>
+        </div>
+      </div>
+<% }else{ %>
+      <a class="nav-link" href="#" onClick="login()"><i class="fas fa-sign-in-alt"></i>Login</a>
+<% } %>
+    </li>
+  </ul>
+</nav>

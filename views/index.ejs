@@ -1,0 +1,185 @@
+<%- include( './header', { user: user, id: null } ) %>
+
+<title>Stop n Go</title>
+<style>
+</style>
+<script>
+<% if( user ){ %>
+$(function(){
+  $.ajax({
+    url: '/docs',
+    type: 'GET',
+    success: function( result ){
+      console.log( result );
+      if( result.status ){
+        result.docs.forEach( function( doc ){
+          var tr = '<tr>'
+            + '<td>' + doc._id + '</td>'
+            + '<td>' + timestamp2datetime( doc.created ) + '</td>'
+            + '<td>' + timestamp2datetime( doc.updated ) + '</td>'
+            + '<td>' + doc.permitted_users.join( ' ' ) + '</td>'
+            + '<td>'
+            + '<button class="btn btn-success" onClick="editDoc(\'' + doc._id + '\')">EDIT</button>'
+            + '<button class="btn btn-danger" onClick="deleteDoc(\'' + doc._id + '\')">DELETE</button>'
+            + '</td>'
+            + '</tr>';
+          $('#tbody').append( tr );
+        });
+      }
+    },
+    error: function( e0, e1, e2 ){
+      console.log( e1 + ' : ' + e2 );
+    }
+  });
+});
+
+function deleteDoc( id ){
+  if( window.confirm( '# ' + id + ' のドキュメントを削除してもいいですか？' ) ){
+    $.ajax({
+      url: '/doc/' + id,
+      type: 'DELETE',
+      success: function( result ){
+        window.location.href = '/';
+      },
+      error: function( e0, e1, e2 ){
+        console.log( e1 + ' : ' + e2 );
+      }
+    });
+  }
+}
+
+function resetButton(){
+  $('#edit_id').val('');
+  $('#edit_url').html('');
+  $('#edit_created').html('');
+  $('#edit_updated').html('');
+  $('#edit_readers').val('');
+  $('#edit_content').val('');
+  $('#edit_btn').html( 'Create' );
+}
+
+function editDoc( id ){
+  resetButton();
+  $('#edit_btn').html( 'Update' );
+  $.ajax({
+    url: '/doc/' + id,
+    type: 'GET',
+    success: function( result ){
+      console.log( result );
+      if( result.status ){
+        var url = location.origin + '/document/' + result.doc._id;
+        $('#edit_id').val( result.doc._id );
+        $('#edit_url').html( '<a target="_blank" href="' + url + '">' + url + '</a>' );
+        $('#edit_created').html( timestamp2datetime( result.doc.created ) );
+        $('#edit_updated').html( timestamp2datetime( result.doc.updated ) );
+        $('#edit_readers').val( result.doc.permitted_users.join( ' ' ) );
+        $('#edit_content').val( result.doc.content );
+      }
+    },
+    error: function( e0, e1, e2 ){
+      console.log( e1 + ' : ' + e2 );
+    }
+  });
+}
+
+function editButton(){
+  var id = $('#edit_id').val();
+  var readers = $('#edit_readers').val();
+  var content = $('#edit_content').val();
+
+  var permitted_users = [];
+  readers = readers.split( ' ' );
+  readers.forEach( function( reader ){
+    permitted_users.push( reader );
+  });
+
+  var body = {
+    permitted_users: permitted_users,
+    content: content
+  };
+
+  var method = 'POST';
+  if( id ){
+    body.id = id;
+    method = 'PUT';
+
+    $.ajax({
+      url: '/doc/' + id,
+      type: 'PUT',
+      data: body,
+      success: function( result ){
+        console.log( result );
+        window.location.href = '/';
+      },
+      error: function( e0, e1, e2 ){
+        console.log( e1 + ' : ' + e2 );
+      }
+    });
+  }else{
+    $.ajax({
+      url: '/doc',
+      type: 'POST',
+      data: body,
+      success: function( result ){
+        console.log( result );
+        window.location.href = '/';
+      },
+      error: function( e0, e1, e2 ){
+        console.log( e1 + ' : ' + e2 );
+      }
+    });
+  }
+}
+<% } %>
+</script>
+</head>
+<body>
+
+<%- include( './nav', { user: user, id: null } ) %>
+
+<div class="container" style="padding: 50px 50px 50px 50px;">
+<% if( user ){ %>
+  <table class="table table-bordered table-striped" id="listtable">
+    <thead>
+      <tr><th>#</th><th>Created</th><th>Updated</th><th>Readers</th><th>Actions</th></tr>
+    </thead>
+    <tbody id="tbody">
+
+    </tbody>
+  </table>
+
+  <input type="hidden" id="edit_id" value=""/>
+  <table class="table table-bordered" id="edittable">
+    <tbody>
+      <tr>
+        <th>URL to be published</th>
+        <td id="edit_url"></td>
+      </tr>
+      <tr>
+        <th>Created</th>
+        <td id="edit_created"></td>
+      </tr>
+      <tr>
+        <th>Updated</th>
+        <td id="edit_updated"></td>
+      </tr>
+      <tr>
+        <th>Readers</th>
+        <td><input class="form-control" type="text" id="edit_readers" placeholder="読む権限を持つ人のツイッターID。無視定時は公開、複数指定する場合はスペース区切り" value=""/></td>
+      </tr>
+      <tr>
+        <th>Content</th>
+        <td><textarea class="form-control" placeholder="本文" id="edit_content"></textarea></td>
+      </tr>
+      <tr>
+        <td colspan="2" style="text-align: right;">
+          <button class="btn btn-primary" id="edit_btn" onClick="editButton()">Create</button>
+          <button class="btn btn-warning" id="reset_btn" onClick="resetButton()">Reset</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+<% } %>
+</div>
+
+<%- include( './footer', {} ) %>

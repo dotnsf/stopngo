@@ -1,0 +1,22 @@
+<%- include( './header', { user: user, id: id } ) %>
+
+<title>Stop n Go</title>
+<style>
+</style>
+</head>
+<body>
+
+<%- include( './nav', { user: user, id: id } ) %>
+
+<div class="container" style="padding: 50px 50px 50px 50px;">
+<% if( doc ){ %>
+  <p><%= doc.content %></p>
+  <div style="text-align: right;">
+    最終更新: <%= doc.updated %>
+  </div>
+<% }else{ %>
+  <p>存在していないか、まだ公開されていないか、或いは参照権限のない文書のようです。</p>
+<% } %>
+</div>
+
+<%- include( './footer', {} ) %>
